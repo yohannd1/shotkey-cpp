@@ -1,26 +1,26 @@
-# SHotKey
-A Suckless Hot Key daemon for X inspired by the suckless philosophy with configurable custom modes.
+# shotkey
 
-~200 LOC. ~20KB binary.
+shotkey is a suckless hot key daemon for X, inspired by the suckless
+philosophy and with configurable custom modes.
 
+For the original version, made by @phenax, see
+https://github.com/phenax/shotkey.
 
 ## Installation
-Clone the repo and run
+
+To install, clone this repository and execute
+
 ```bash
 sudo make install
 ```
 
+to compile the program.
 
-## Configuring
-Fork this repo and configure it to your likings.
-You can edit `config.h` to configure key bindings.
+## Configuration
 
-* `shell` - Configure the shell used for executing the commands
-* `modes` - A mapping defining all mode keys bindings
-* `keys` - All normal mode key bindings
-* `on_mode_change` - Hook script to listen to mode changes. Useful for status bar integration
-* `mode_properties` - Some meta information about mode. (Label is useful for `on_mode_change`)
+To configure, edit the `config.h` file and recompile/reinstall the
+program.
 
-You can checkout the [personal branch](https://github.com/phenax/shotkey/tree/personal) for my personal config.
+<!-- TODO: talk about hooks -->
 
-Read the man page for more details.
+Read the man page for more details on how to use this.

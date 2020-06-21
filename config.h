@@ -1,6 +1,10 @@
-#define Super Mod4Mask
+/* the main mod mask. Used */
+#define Mod Mod4Mask
+
+/* the shell used to spawn commands */
 char shell[] = "/bin/sh";
 
+/* the possible modes to be used */
 enum {
 	Music,
 	Bright,
@@ -28,10 +32,11 @@ Key keys[] = {
 	{ Super|ShiftMask, XK_x,   mode(Bright, True) },
 };
 
+/* useful metadata */
 ModeProperties mode_properties[MODE_SIZE] = {
 	[Music] = { "Music player" },
 	[Bright] = { "Brightness" },
 };
 
-// Call this script on mode change
+/* shell script called on mode change */
 char* on_mode_change = "notify-send \"kadj [$SHOTKEY_MODE_ID] $SHOTKEY_MODE_LABEL\"";
