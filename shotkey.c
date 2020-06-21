@@ -32,13 +32,7 @@ struct ModeProperties {
 	char* label;
 };
 
-/* static variables */
-static int current_mode = NormalMode;
-static int is_mode_persistent = 0;
-extern char** environ; /* FIXME: why is this extern? */
-
-#include "config.h"
-
+/* functions */
 void bind_key(Display *dpy, Window win, uint mod, KeySym key);
 void unbind_key(Display *dpy, Window win, uint mod, KeySym key);
 int error_handler(Display *disp, XErrorEvent *xe);
@@ -49,16 +43,23 @@ void spawn(char** command);
 void run(Display* dpy, Window win, Command command);
 void keypress(Display *dpy, Window win, XKeyEvent *ev);
 
+/* static variables */
+static int current_mode = NormalMode;
+static int is_mode_persistent = 0;
+extern char** environ; /* FIXME: why is this extern? */
+
+#include "config.h"
+
 int main() {
+	XEvent ev;
+	int running = 1;
+
 	XSetErrorHandler(error_handler);
-
-	int running = 1, i = 0;
-
 	Display *dpy = XOpenDisplay(0);
 	Window root = DefaultRootWindow(dpy);
 
 	/* grab keys */
-	for (i = 0; i < LENGTH(keys); i++) {
+	for (uint i = 0; i < LENGTH(keys); i++) {
 		bind_key(dpy, root, keys[i].mod, keys[i].key);
 	}
 
@@ -67,16 +68,12 @@ int main() {
 	handle_mode_change();
 
 	/* main event loop */
-	XEvent ev;
 	XSync(dpy, False);
 	while (running) {
 		XMaskEvent(dpy, KeyPressMask, &ev);
 
-		switch (ev.type) {
-			case KeyPress: {
-					       keypress(dpy, root, &ev.xkey);
-					       break;
-				       }
+		if (ev.type == KeyPress) {
+			keypress(dpy, root, &ev.xkey);
 		}
 	}
 
@@ -94,20 +91,19 @@ void unbind_key(Display *dpy, Window win, uint mod, KeySym key) {
 }
 
 int error_handler(Display *disp, XErrorEvent *xe) {
-	switch(xe->error_code) {
-		case BadAccess:
-			printf("shotkey: [BadAccess] Cant grab key binding. Already grabbed\n");
-			return 0;
+	if (xe->error_code == BadAccess) {
+		printf("shotkey: BadAccess: can't grab already grabbed keybinding\n");
+		return 0;
 	}
 
-	printf("shotkey: Something went wrong\n");
+	printf("shotkey: something went wrong\n");
 	return 1;
 }
 
-char* get_mode_label() {
+char *get_mode_label() {
 	if (current_mode == NormalMode)
 		return "";
-	if (LENGTH(mode_properties) <= current_mode) 
+	if (LENGTH(mode_properties) <= current_mode)
 		return "";
 
 	ModeProperties props = mode_properties[current_mode];
@@ -133,7 +129,7 @@ void set_mode(int mode, uint persist) {
 	handle_mode_change();
 }
 
-void spawn(char** command) {
+void spawn(char **command) {
 	if (fork() == 0) {
 		setsid();
 		execve(command[0], command, environ);
@@ -163,13 +159,12 @@ void run(Display* dpy, Window win, Command command) {
 }
 
 void keypress(Display *dpy, Window win, XKeyEvent *ev) {
-	uint i;
 	Key mode_key;
 	KeySym keysym = XKeycodeToKeysym(dpy, (KeyCode) ev->keycode, 0);
 
 	if (current_mode == NormalMode) {
 		// Bind all the normal mode keys
-		for (i = 0; i < LENGTH(keys); i++) {
+		for (uint i = 0; i < LENGTH(keys); i++) {
 			if (keysym == keys[i].key && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)) {
 				run(dpy, win, keys[i].command);
 			}
@@ -180,7 +175,7 @@ void keypress(Display *dpy, Window win, XKeyEvent *ev) {
 
 		if (modes[current_mode] && current_mode < LENGTH(modes)) {
 			// Check if key is in mode and execute
-			for (i = 0; i < LENGTH(modes[current_mode]); i++) {
+			for (uint i = 0; i < LENGTH(modes[current_mode]); i++) {
 				mode_key = modes[current_mode][i];
 
 				if (keysym == mode_key.key && CLEANMASK(mode_key.mod) == CLEANMASK(ev->state)) {
