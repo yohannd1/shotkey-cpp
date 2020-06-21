@@ -39,6 +39,50 @@ extern char** environ; /* FIXME: why is this extern? */
 
 #include "config.h"
 
+void bind_key(Display *dpy, Window win, uint mod, KeySym key);
+void unbind_key(Display *dpy, Window win, uint mod, KeySym key);
+int error_handler(Display *disp, XErrorEvent *xe);
+char *get_mode_label();
+void handle_mode_change();
+void set_mode(int mode, uint persist);
+void spawn(char** command);
+void run(Display* dpy, Window win, Command command);
+void keypress(Display *dpy, Window win, XKeyEvent *ev);
+
+int main() {
+	XSetErrorHandler(error_handler);
+
+	int running = 1, i = 0;
+
+	Display *dpy = XOpenDisplay(0);
+	Window root = DefaultRootWindow(dpy);
+
+	/* grab keys */
+	for (i = 0; i < LENGTH(keys); i++) {
+		bind_key(dpy, root, keys[i].mod, keys[i].key);
+	}
+
+	XSelectInput(dpy, root, KeyPressMask);
+
+	handle_mode_change();
+
+	/* main event loop */
+	XEvent ev;
+	XSync(dpy, False);
+	while (running) {
+		XMaskEvent(dpy, KeyPressMask, &ev);
+
+		switch (ev.type) {
+			case KeyPress: {
+					       keypress(dpy, root, &ev.xkey);
+					       break;
+				       }
+		}
+	}
+
+	XCloseDisplay(dpy);
+}
+
 void bind_key(Display *dpy, Window win, uint mod, KeySym key) {
 	int keycode = XKeysymToKeycode(dpy, key);
 	XGrabKey(dpy, keycode, mod, win, False, GrabModeAsync, GrabModeAsync);
@@ -159,38 +203,4 @@ void keypress(Display *dpy, Window win, XKeyEvent *ev) {
 			set_mode(NormalMode, False);
 		}
 	}
-}
-
-int main() {
-	XSetErrorHandler(error_handler);
-
-	int running = 1, i = 0;
-
-	Display *dpy = XOpenDisplay(0);
-	Window root = DefaultRootWindow(dpy);
-
-	// Grab keys
-	for (i = 0; i < LENGTH(keys); i++) {
-		bind_key(dpy, root, keys[i].mod, keys[i].key);
-	}
-
-	XSelectInput(dpy, root, KeyPressMask);
-
-	handle_mode_change();
-
-	/* main event loop */
-	XEvent ev;
-	XSync(dpy, False);
-	while (running) {
-		XMaskEvent(dpy, KeyPressMask, &ev);
-
-		switch (ev.type) {
-			case KeyPress: {
-					       keypress(dpy, root, &ev.xkey);
-					       break;
-				       }
-		}
-	}
-
-	XCloseDisplay(dpy);
 }
