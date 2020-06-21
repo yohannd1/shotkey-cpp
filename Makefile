@@ -38,4 +38,7 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/shotkey\
 		${DESTDIR}${MANPREFIX}/man1/shotkey.1
 
+run: shotkey
+	./shotkey
+
 .PHONY: all options clean dist install uninstall

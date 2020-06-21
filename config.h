@@ -17,19 +17,19 @@ enum {
 // NOTE: "10" here is the maximum number of key bindings for each mode
 Key modes[MODE_SIZE][10] = {
 	[Music] = {
-		{ 0, XK_m,   cmd("notify-send inside_music") },
+		{ 0, XK_m,   CMD("notify-send inside_music") },
 	},
 	[Bright] = {
-		{ 0, XK_m,   cmd("notify-send inside_bright") },
-		{ 0, XK_n,   cmd("notify-send inside_bright_1") },
+		{ 0, XK_m,   CMD("notify-send inside_bright") },
+		{ 0, XK_n,   CMD("notify-send inside_bright_1") },
 	},
 };
 
 // Define normal mode key bindings here
 Key keys[] = {
-	{ Super|ShiftMask, XK_y,   cmd("notify-send hello") },
-	{ Super|ShiftMask, XK_z,   mode(Music, False) },
-	{ Super|ShiftMask, XK_x,   mode(Bright, True) },
+	{ Mod|ShiftMask, XK_y,   CMD("notify-send hello") },
+	{ Mod|ShiftMask, XK_z,   MODE(Music, False) },
+	{ Mod|ShiftMask, XK_x,   MODE(Bright, True) },
 };
 
 /* useful metadata */

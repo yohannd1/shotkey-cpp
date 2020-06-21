@@ -4,43 +4,47 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-typedef struct Command {
-	char* command;
-	unsigned int mode;
-	int persist;
-} Command;
-
-typedef struct Key {
-	unsigned int mod;
-	KeySym key;
-	Command command;
-} Key;
-
-typedef struct ModeProperties {
-	char* label;
-} ModeProperties;
-
+/* macros */
 #define NormalMode -1
-
-#define cmd(c)      (Command) { c,     NormalMode,  False }
-#define mode(m, p)  (Command) { NULL,  m,           p }
-
-#include "config.h"
-
+#define CMD(c)     (Command) { c,     NormalMode,  False }
+#define MODE(m, p) (Command) { NULL,  m,           p }
 #define LENGTH(X) (sizeof X / sizeof X[0])
 #define CLEANMASK(mask) (mask & ~LockMask & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
 
-int current_mode = NormalMode;
-int is_mode_persistent = 0;
+/* typedefs */
+typedef unsigned int uint;
+typedef struct Command Command;
+typedef struct Key Key;
+typedef struct ModeProperties ModeProperties;
 
-extern char** environ;
+/* structs */
+struct Command {
+	char* command;
+	unsigned int mode;
+	int persist;
+};
+struct Key {
+	unsigned int mod;
+	KeySym key;
+	Command command;
+};
+struct ModeProperties {
+	char* label;
+};
 
-void bind_key(Display *dpy, Window win, unsigned int mod, KeySym key) {
+/* static variables */
+static int current_mode = NormalMode;
+static int is_mode_persistent = 0;
+extern char** environ; /* FIXME: why is this extern? */
+
+#include "config.h"
+
+void bind_key(Display *dpy, Window win, uint mod, KeySym key) {
 	int keycode = XKeysymToKeycode(dpy, key);
 	XGrabKey(dpy, keycode, mod, win, False, GrabModeAsync, GrabModeAsync);
 }
 
-void unbind_key(Display *dpy, Window win, unsigned int mod, KeySym key) {
+void unbind_key(Display *dpy, Window win, uint mod, KeySym key) {
 	int keycode = XKeysymToKeycode(dpy, key);
 	XUngrabKey(dpy, keycode, mod, win);
 }
@@ -54,16 +58,6 @@ int error_handler(Display *disp, XErrorEvent *xe) {
 
 	printf("shotkey: Something went wrong\n");
 	return 1;
-}
-
-void spawn(char** command) {
-	if (fork() == 0) {
-		setsid();
-		execve(command[0], command, environ);
-		fprintf(stderr, "shotkey: execve %s", command[0]);
-		perror(" failed");
-		exit(0);
-	}
 }
 
 char* get_mode_label() {
@@ -89,15 +83,25 @@ void handle_mode_change() {
 	spawn(cmd);
 }
 
-void set_mode(int mode, unsigned int persist) {
+void set_mode(int mode, uint persist) {
 	current_mode = mode;
 	is_mode_persistent = persist;
 	handle_mode_change();
 }
 
+void spawn(char** command) {
+	if (fork() == 0) {
+		setsid();
+		execve(command[0], command, environ);
+		fprintf(stderr, "shotkey: execve %s", command[0]);
+		perror(" failed");
+		exit(0);
+	}
+}
+
 void run(Display* dpy, Window win, Command command) {
 	Key mode_key;
-	unsigned int i;
+	uint i;
 
 	if (command.command) {
 		char* cmd[] = {shell, "-c", command.command, NULL};
@@ -115,7 +119,7 @@ void run(Display* dpy, Window win, Command command) {
 }
 
 void keypress(Display *dpy, Window win, XKeyEvent *ev) {
-	unsigned int i;
+	uint i;
 	Key mode_key;
 	KeySym keysym = XKeycodeToKeysym(dpy, (KeyCode) ev->keycode, 0);
 
