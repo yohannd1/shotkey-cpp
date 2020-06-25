@@ -1,10 +1,11 @@
-# shotkey - Suckless hot key daemon
+# shotkey - Suckless hotkey daemon
 # See LICENSE file for copyright and license details.
 
 include config.mk
 
-SRC = shotkey.c
-OBJ = ${SRC:.c=.o}
+DEP := shotkey
+SRC := $(patsubst %,%.cpp,$(DEP))
+OBJ := $(patsubst %,%.o,$(DEP))
 
 all: clean options shotkey
 
@@ -14,17 +15,17 @@ options:
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
 
-.c.o:
+.o: %.cpp
 	${CC} -c ${CFLAGS} $<
 
-config.h:
-	cp config.def.h config.h
+config.hpp:
+	cp config.def.hpp config.hpp
 
-shotkey: ${OBJ}
-	${CC} -o $@ ${OBJ} ${LDFLAGS}
+shotkey: $(OBJ)
+	${CC} -o $@ $(OBJ) ${LDFLAGS}
 
 clean:
-	rm -f shotkey ${OBJ}
+	rm -f shotkey $(OBJ)
 
 install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin

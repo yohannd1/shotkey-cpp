@@ -1,4 +1,5 @@
 # TODO
+
   - [ ] KeyPress and KeyRelease options
   - [X] Grab entire keyboard for modes
   - [X] Add modes
