@@ -6,6 +6,11 @@ philosophy and with configurable custom modes.
 For the original version, made by @phenax, see
 https://github.com/phenax/shotkey.
 
+### Why did you remake this in C++?
+
+I wanted to add some features (specially), but I also felt like tweaking
+the API. Idk if I needed to rewrite all of this.
+
 ## Installation
 
 To install, clone this repository and execute
