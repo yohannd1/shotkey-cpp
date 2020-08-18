@@ -1,5 +1,3 @@
-/* TODO: organize declarations and put them near where they are used instead of at the start of a function */
-
 #include <stdio.h>
 #include <unistd.h>
 #include <X11/Xlib.h>
