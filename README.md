@@ -23,7 +23,7 @@ to compile the program.
 
 ## Configuration
 
-To configure, edit the `config.hpp` file and recompile/reinstall the
+To configure, edit the `config.hh` file and recompile/reinstall the
 program.
 
 <!-- TODO: talk about hooks -->

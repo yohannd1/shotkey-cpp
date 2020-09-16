@@ -8,12 +8,12 @@
 #include <vector>
 #include <memory>
 
-#include "shotkey.hpp"
+#include "shotkey.hh"
 
 static auto mode_stack = std::vector<KeyModeData>();
 static auto bindings = std::vector<Keybinding>();
 
-#include "config.hpp"
+#include "config.hh"
 
 int main(void) {
     XSetErrorHandler(handle_xerror);

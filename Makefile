@@ -4,7 +4,7 @@
 include config.mk
 
 DEP := shotkey
-SRC := $(patsubst %,%.cpp,$(DEP))
+SRC := $(patsubst %,%.cc,$(DEP))
 OBJ := $(patsubst %,%.o,$(DEP))
 
 all: clean options shotkey
@@ -18,8 +18,8 @@ options:
 .o: %.cpp
 	${CC} -c ${CFLAGS} $<
 
-config.hpp:
-	cp config.def.hpp config.hpp
+config.hh:
+	cp config.def.hh config.hh
 
 shotkey: $(OBJ)
 	${CC} -o $@ $(OBJ) ${LDFLAGS}
@@ -36,7 +36,7 @@ install: all
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/shotkey.1
 
 uninstall:
-	rm -f ${DESTDIR}${PREFIX}/bin/shotkey\
+	rm -f ${DESTDIR}${PREFIX}/bin/shotkey \
 		${DESTDIR}${MANPREFIX}/man1/shotkey.1
 
 run: shotkey
