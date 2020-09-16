@@ -27,7 +27,7 @@ namespace cfg {
     }
 
     namespace hooks {
-        void startup(std::vector<Keybinding>& bindings) {
+        void startup(std::vector<Keybinding> &bindings) {
             bind(KeyMode::Normal, Mod, XK_n, KMChangeCommand, (KeyMode::Alt, false));
             bind(KeyMode::Alt, Mod, XK_n, ShellCommand, ("notify-send asd"));
         }

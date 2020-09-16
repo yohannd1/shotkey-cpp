@@ -3,6 +3,7 @@
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <X11/Xutil.h>
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -10,8 +11,8 @@
 
 #include "shotkey.hh"
 
-static auto mode_stack = std::vector<KeyModeData>();
-static auto bindings = std::vector<Keybinding>();
+static std::vector<KeyModeData> mode_stack;
+static std::vector<Keybinding> bindings;
 
 #include "config.hh"
 
@@ -20,11 +21,11 @@ int main(void) {
 
     Display *disp = XOpenDisplay(0); /* TODO: change these pointers into references..? */
     Window root = DefaultRootWindow(disp);
-    auto running = true;
+    bool running = true;
     mode_stack.push_back(std::tuple<cfg::KeyMode, bool>(cfg::KeyMode::Normal, true));
     cfg::hooks::startup(bindings);
 
-    for (auto& key : bindings) {
+    for (auto &key: bindings) {
         bind_key(key, disp, root);
     }
 
@@ -72,25 +73,25 @@ void die(const char *s) {
     exit(1);
 }
 
-void handle_keypress(std::vector<KeyModeData>& mode_stack, const std::vector<Keybinding>& bindings, Display *disp, Window win, XKeyEvent *ev) {
+void handle_keypress(std::vector<KeyModeData> &mode_stack, const std::vector<Keybinding> &bindings, Display *disp, Window win, XKeyEvent *ev) {
     cfg::KeyMode mode;
     bool persist;
     std::tie(mode, persist) = *mode_stack.rbegin();
 
     auto keysym = XkbKeycodeToKeysym(disp, ev->keycode, 0, 0);
-    for (auto& kb : bindings) {
+    for (auto& kb: bindings) {
         if (kb.mode == mode) {
             if (!persist) {
                 mode_stack.pop_back();
                 cfg::hooks::mode_change(std::get<0>(*mode_stack.rbegin()));
             }
-            const std::unique_ptr<Command>& test = kb.cmd;
+            const std::unique_ptr<Command> &test = kb.cmd;
             process_command(*test);
         }
     }
 }
 
-void process_command(const Command& cmd) {
+void process_command(const Command &cmd) {
     cmd.execute();
 }
 
@@ -115,10 +116,10 @@ Keybinding::Keybinding(cfg::KeyMode mode, uint modmask, KeySym key, std::unique_
     cmd = std::move(cmd_);
 }
 
-void bind_key(const Keybinding& kb, Display *disp, Window win) {
+void bind_key(const Keybinding &kb, Display *disp, Window win) {
     XGrabKey(disp, XKeysymToKeycode(disp, kb.key), kb.modmask, win, false, GrabModeAsync, GrabModeAsync);
 }
 
-void unbind_key(const Keybinding& kb, Display *disp, Window win) {
+void unbind_key(const Keybinding &kb, Display *disp, Window win) {
     XUngrabKey(disp, XKeysymToKeycode(disp, kb.key), kb.modmask, win);
 }
