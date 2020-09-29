@@ -3,7 +3,7 @@
 
 include config.mk
 
-DEP := shotkey
+DEP := main
 SRC := $(patsubst %,%.cc,$(DEP))
 OBJ := $(patsubst %,%.o,$(DEP))
 
@@ -15,13 +15,14 @@ options:
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
 
-.o: %.cpp
-	${CC} -c ${CFLAGS} $<
+%.o: %.cc
+	${CC} -c ${CFLAGS} $< -o $@
 
 config.hh:
 	cp config.def.hh config.hh
 
 shotkey: $(OBJ)
+	@echo $(OBJ)
 	${CC} -o $@ $(OBJ) ${LDFLAGS}
 
 clean:
