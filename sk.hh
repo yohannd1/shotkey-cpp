@@ -1,15 +1,18 @@
+#ifndef _SK_HH
+#define _SK_HH
+
+#include <functional>
+#include <iostream>
+#include <cstdlib>
+#include <memory>
+#include <vector>
+#include <string>
+
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <X11/Xutil.h>
-#include <unistd.h>
-#include <X11/Xutil.h>
 
-#include <cstdlib>
-#include <vector>
-#include <iostream>
-#include <functional>
-#include <memory>
-#include <string>
+#include <unistd.h>
 
 static int handle_x_error(Display *disp, XErrorEvent *ev);
 static void spawn_async(const char **command);
@@ -195,3 +198,4 @@ static void spawn_async(const char **command) {
     }
 }
 
+#endif /* _SK_HH */
